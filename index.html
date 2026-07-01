@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Beli barangan kraf tangan Sabah yang eksklusif secara dalam talian. Koleksi gelang, rantai, dan cincin mutiara asli dari Pasar Kraftangan Kota Kinabalu. Direkodkan secara terus dan selamat.">
+    <meta name="keywords" content="pasar kraftangan sabah, mutiara sabah, gelang mutiara, rantai mutiara, cincin mutiara, kota kinabalu, kraftangan filipino market">
+    <meta name="author" content="Pasar Kraftangan Sabah">
+    <title>Pasar Kraftangan Sabah - Kedai Mutiara & Kraf Eksklusif</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Google Sign-In SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="light-theme">
+    
+    <!-- Dinding Log Masuk (Login Wall Overlay) -->
+    <div id="login-wall" class="login-wall">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="fa-solid fa-gem"></i>
+            </div>
+            <h2>Pasar Kraftangan Sabah</h2>
+            <p class="login-subtitle">Sila pilih peranan anda dan log masuk menggunakan Akaun Google untuk meneruskan.</p>
+            
+            <div class="role-selector-wrapper">
+                <label class="role-label">Masuk Sebagai:</label>
+                <div class="role-grid">
+                    <button type="button" class="role-btn active" data-role="pembeli">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span>Pembeli</span>
+                    </button>
+                    <button type="button" class="role-btn" data-role="penjual">
+                        <i class="fa-solid fa-store"></i>
+                        <span>Penjual</span>
+                    </button>
+                    <button type="button" class="role-btn" data-role="admin">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <span>Admin</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="login-btn-container" style="display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%;">
+                <div id="google-login-wall-btn"></div>
+                <div id="mock-login-container" class="mock-login-container hidden" style="width: 100%; text-align: center; border-top: 1px dashed var(--border-color); padding-top: 15px;">
+                    <p style="font-size: 0.75rem; color: var(--text-light); margin-bottom: 10px;">
+                        Uji tanpa Google API (untuk protokol file:///):
+                    </p>
+                    <button type="button" id="mock-login-btn" class="btn btn-outline btn-block" style="width: 100%;">
+                        <i class="fa-solid fa-flask"></i> Masuk Ujian Tempatan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Header & Navigation -->
+    <header class="main-header">
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <span class="logo-icon"><i class="fa-solid fa-gem"></i></span>
+                <span class="logo-text">Kraftangan <span class="highlight">Sabah</span></span>
+            </a>
+            
+            <nav class="nav-menu" id="nav-menu">
+                <ul>
+                    <li><a href="#" class="nav-link active">Laman Utama</a></li>
+                    <li><a href="#katalog" class="nav-link">Koleksi Kraf</a></li>
+                    <li><a href="#tentang-kami" class="nav-link">Keunikan Mutiara</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <!-- Google Account Profile / Sign In Button -->
+                <div id="user-profile-container" class="user-profile-container"></div>
+
+                <!-- Theme Toggle -->
+                <button id="theme-toggle-btn" class="action-btn theme-btn" aria-label="Tukar Tema">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                
+                <!-- Cart Button -->
+                <button id="cart-toggle-btn" class="action-btn cart-btn" aria-label="Buka Troli">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span id="cart-badge" class="cart-badge">0</span>
+                </button>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="action-btn mobile-menu-btn" aria-label="Menu Mudah Alih">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Papan Pemuka Penjual (Seller Dashboard) -->
+    <section id="seller-dashboard" class="dashboard-section hidden">
+        <div class="container">
+            <div class="dashboard-banner">
+                <div class="dashboard-title-group">
+                    <span class="badge badge-seller"><i class="fa-solid fa-store"></i> Mod Penjual</span>
+                    <h2>Papan Pemuka Penjual (Gerai 12)</h2>
+                    <p>Urus katalog barangan kraftangan dan tinjau tempahan masuk.</p>
+                </div>
+                <button id="add-product-btn" class="btn btn-primary">
+                    <i class="fa-solid fa-circle-plus"></i> Tambah Produk Baru
+                </button>
+            </div>
+            
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-box-open"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Jumlah Produk</span>
+                        <span id="seller-total-products" class="stat-value">9</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-receipt"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Tempahan Masuk</span>
+                        <span id="seller-total-orders" class="stat-value">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Jumlah Jualan (Kasar)</span>
+                        <span id="seller-total-sales" class="stat-value">RM 0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h3><i class="fa-solid fa-list-check"></i> Pesanan Kraf Tempatan (Log MySQL)</h3>
+                    <p>Senarai pelanggan yang menghantar borang pembelian.</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table" id="seller-orders-table">
+                        <thead>
+                            <tr>
+                                <th>ID Pesanan</th>
+                                <th>Nama Pelanggan</th>
+                                <th>Alamat Penghantaran</th>
+                                <th>Tarikh</th>
+                                <th>Jumlah Bayaran</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Diisi dinamik oleh JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Panel Pentadbir Utama (Admin Panel) -->
+    <section id="admin-panel" class="dashboard-section hidden">
+        <div class="container">
+            <div class="dashboard-banner">
+                <div class="dashboard-title-group">
+                    <span class="badge badge-admin"><i class="fa-solid fa-user-shield"></i> Kawalan Admin</span>
+                    <h2>Panel Pentadbir Utama (Admin Control Panel)</h2>
+                    <p>Urus pengguna Google, laporan jualan, dan hak akses peranan dalam pangkalan data.</p>
+                </div>
+            </div>
+
+            <div class="stats-cards">
+                <div class="stat-card stat-admin-user">
+                    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Pengguna Berdaftar</span>
+                        <span id="admin-total-users" class="stat-value">0</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-admin-orders">
+                    <div class="stat-icon"><i class="fa-solid fa-receipt"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Pesanan Keseluruhan</span>
+                        <span id="admin-total-orders" class="stat-value">0</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-admin-revenue">
+                    <div class="stat-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Kutipan Kasar</span>
+                        <span id="admin-total-revenue" class="stat-value">RM 0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h3><i class="fa-solid fa-users-gear"></i> Pengurusan Pengguna Google & Peranan</h3>
+                    <p>Senarai pengguna berdaftar melalui Google Auth dan peranan masing-masing.</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table" id="admin-users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama</th>
+                                <th>E-mel</th>
+                                <th>Peranan</th>
+                                <th>Tarikh Daftar</th>
+                                <th>Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Diisi dinamik oleh JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-overlay"></div>
+            <div class="container hero-container">
+                <div class="hero-content">
+                    <span class="hero-tag"><i class="fa-solid fa-award"></i> Kraf Tangan & Mutiara Asli Sabah</span>
+                    <h1 class="hero-title">Keindahan Warisan Sabah Di Hujung Jari Anda</h1>
+                    <p class="hero-subtitle">Miliki koleksi gelang, rantai, dan cincin buatan tangan eksklusif dari Pasar Kraftangan Kota Kinabalu dengan mutiara asli pilihan.</p>
+                    <div class="hero-actions">
+                        <a href="#katalog" class="btn btn-primary btn-lg">Teroka Koleksi <i class="fa-solid fa-arrow-right"></i></a>
+                        <a href="#tentang-kami" class="btn btn-outline btn-lg">Ketahui Keunikan</a>
+                    </div>
+                </div>
+                <div class="hero-image-container">
+                    <div class="hero-img-backdrop"></div>
+                    <img src="assets/hero.png" alt="Seni Mutiara dan Kraftangan Sabah" class="hero-img">
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Showcase Section -->
+        <section class="features-section">
+            <div class="container">
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fa-solid fa-certificate"></i></div>
+                        <h3>100% Mutiara Asli</h3>
+                        <p>Jaminan mutiara asli dari perairan Sabah, sama ada jenis air tawar atau air masin premium.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fa-solid fa-hands-holding"></i></div>
+                        <h3>Hasil Rimba & Seni Tangan</h3>
+                        <p>Dianyam dan direka khas oleh pengrajin tempatan di Kota Kinabalu secara tradisional.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fa-solid fa-comment-sms"></i></div>
+                        <h3>Pesanan Mudah & Cepat</h3>
+                        <p>Pilih produk kegemaran, isi maklumat saiz, dan terus hantar pesanan secara terus tanpa rumit.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Catalog Section -->
+        <section id="katalog" class="catalog-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Katalog Kami</span>
+                    <h2 class="section-title">Koleksi Produk Eksklusif</h2>
+                    <p class="section-desc">Pilih daripada koleksi gelang mutiara, rantai manik tradisional, dan cincin perak bertatahkan mutiara asli.</p>
+                </div>
+
+                <!-- Catalog Toolbar (Search, Filter, Sort) -->
+                <div class="catalog-toolbar">
+                    <div class="search-wrapper">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="search-input" placeholder="Cari gelang, rantai, cincin...">
+                    </div>
+                    
+                    <div class="filter-wrapper">
+                        <button class="filter-btn active" data-category="all">Semua</button>
+                        <button class="filter-btn" data-category="gelang"><i class="fa-solid fa-circle-notch"></i> Gelang</button>
+                        <button class="filter-btn" data-category="rantai"><i class="fa-solid fa-link"></i> Rantai</button>
+                        <button class="filter-btn" data-category="cincin"><i class="fa-regular fa-circle"></i> Cincin</button>
+                    </div>
+
+                    <div class="sort-wrapper">
+                        <label for="sort-select"><i class="fa-solid fa-arrow-down-up-wide"></i> Isih:</label>
+                        <select id="sort-select">
+                            <option value="default">Pilihan Utama</option>
+                            <option value="price-low">Harga: Murah ke Mahal</option>
+                            <option value="price-high">Harga: Mahal ke Murah</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div id="products-grid" class="products-grid">
+                    <!-- Dynamic product cards will be rendered here by JS -->
+                    <div class="loading-state">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <p>Memuatkan produk...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Sabah Pearls / Educational Section -->
+        <section id="tentang-kami" class="about-section">
+            <div class="container about-container">
+                <div class="about-content">
+                    <span class="section-tag">Panduan Kraf</span>
+                    <h2 class="section-title">Mengapa Mutiara & Kraf Sabah Begitu Istimewa?</h2>
+                    <p>Sabah, yang juga dikenali sebagai "Negeri Di Bawah Bayu", sangat terkenal dengan mutiara aslinya yang dituai dari perairan jernih di Pantai Timur Sabah (seperti Semporna dan Sandakan).</p>
+                    
+                    <div class="accordion">
+                        <div class="accordion-item active">
+                            <button class="accordion-header" id="acc-btn-1">
+                                <span>Mutiara Air Tawar vs. Mutiara Air Masin</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </button>
+                            <div class="accordion-content" id="acc-content-1">
+                                <p>Mutiara Air Tawar (Freshwater Pearls) mempunyai pelbagai warna semula jadi (pink, lavender, putih) dan lebih tahan lasak. Mutiara Air Masin (Saltwater/South Sea Pearls) pula mempunyai kilauan (lustre) yang sangat tinggi, berbentuk bulat sempurna, lebih besar, dan dianggap sebagai mutiara gred mewah terulung.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <button class="accordion-header" id="acc-btn-2">
+                                <span>Nilai Kraf Tangan Buatan Tempatan</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </button>
+                            <div class="accordion-content" id="acc-content-2">
+                                <p>Setiap produk dianyam secara manual menggunakan benang nylon berkualiti tinggi, manik-manik tradisional, dan logam perak 925 tulen. Membeli di sini secara langsung membantu menyokong komuniti artisan dan peniaga kecil di Pasar Kraftangan Kota Kinabalu.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <button class="accordion-header" id="acc-btn-3">
+                                <span>Cara Menjaga Barang Kemas Mutiara</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </button>
+                            <div class="accordion-content" id="acc-content-3">
+                                <p>Mutiara adalah organik. Lap lembut dengan kain lembap selepas dipakai. Elakkan semburan minyak wangi (perfume) atau bahan kimia secara langsung pada mutiara untuk mengekalkan kilauannya sepanjang hayat.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="about-media">
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <i class="fa-solid fa-shop"></i>
+                            <h4>Singgah ke Kedai Kami</h4>
+                        </div>
+                        <p>Pasar Kraftangan Kota Kinabalu (Filipino Market), Jalan Tun Fuad Stephens, 88000 Kota Kinabalu, Sabah.</p>
+                        <div class="info-badge">Dibuka Setiap Hari: 8:00 AM - 6:00 PM</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container footer-container">
+            <div class="footer-brand">
+                <a href="#" class="logo">
+                    <span class="logo-icon"><i class="fa-solid fa-gem"></i></span>
+                    <span class="logo-text">Kraftangan <span class="highlight">Sabah</span></span>
+                </a>
+                <p>Membawa warisan budaya dan keindahan mutiara asli Sabah terus ke kediaman anda.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Kategori</h4>
+                <ul>
+                    <li><a href="#katalog" data-filter-link="gelang">Gelang Mutiara</a></li>
+                    <li><a href="#katalog" data-filter-link="rantai">Rantai Manik & Mutiara</a></li>
+                    <li><a href="#katalog" data-filter-link="cincin">Cincin Perak Mutiara</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-contact">
+                <h4>Hubungi Kami</h4>
+                <p><i class="fa-solid fa-location-dot"></i> Gerai No. 12, Pasar Kraftangan, Kota Kinabalu, Sabah</p>
+                <p><i class="fa-solid fa-phone"></i> +60 12-345 6789</p>
+                <p><i class="fa-solid fa-envelope"></i> info@kraftangansabah.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container footer-bottom-container">
+                <p>&copy; 2026 Pasar Kraftangan Kota Kinabalu. Hak Cipta Terpelihara.</p>
+                <p>Direka dengan penuh bangga mewakili Sabah 🌾</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shopping Cart Sidebar (Slide-out Drawer) -->
+    <div id="cart-overlay" class="cart-overlay"></div>
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3><i class="fa-solid fa-bag-shopping"></i> Troli Belanja Anda</h3>
+            <button id="cart-close-btn" class="close-btn" aria-label="Tutup Troli">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        
+        <div id="cart-items-container" class="cart-items-container">
+            <!-- Dynamic cart items will render here -->
+            <div class="empty-cart-state">
+                <i class="fa-solid fa-basket-shopping"></i>
+                <p>Troli anda masih kosong.</p>
+                <a href="#katalog" id="start-shopping-btn" class="btn btn-primary btn-sm">Mula Membeli-belah</a>
+            </div>
+        </div>
+        
+        <div id="cart-footer" class="cart-footer hidden">
+            <div class="cart-totals">
+                <div class="total-row">
+                    <span>Jumlah Barangan:</span>
+                    <span id="cart-total-qty">0</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>Jumlah Keseluruhan:</span>
+                    <span id="cart-total-price">RM 0.00</span>
+                </div>
+            </div>
+            
+            <!-- Checkout Form inside Cart Drawer -->
+            <form id="checkout-form" class="checkout-form">
+                <h4>Butiran Penerima</h4>
+                <div class="form-group">
+                    <label for="checkout-name">Nama Penuh *</label>
+                    <input type="text" id="checkout-name" required placeholder="Masukkan nama anda">
+                </div>
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <label for="checkout-address" style="margin-bottom: 0;">Alamat Penghantaran *</label>
+                        <button type="button" id="pin-location-btn" style="background: none; border: none; color: var(--primary); font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 0;">
+                            <i class="fa-solid fa-location-dot"></i> Pin Google Maps
+                        </button>
+                    </div>
+                    <textarea id="checkout-address" rows="2" required placeholder="Alamat lengkap pos/COD KK"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="checkout-notes">Nota Khas (Pilihan)</label>
+                    <input type="text" id="checkout-notes" placeholder="Contoh: Nak kad ucapan hari jadi">
+                </div>
+                
+                <button type="submit" id="whatsapp-checkout-btn" class="btn btn-success btn-block">
+                    <i class="fa-solid fa-check"></i> Hantar Pesanan
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Details Modal -->
+    <div id="product-modal" class="modal-overlay">
+        <div class="modal-container">
+            <button id="modal-close-btn" class="close-btn modal-close-btn" aria-label="Tutup Detail">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-grid">
+                <!-- Left Column: Gallery, Tabs, Badges -->
+                <div class="modal-left-column">
+                    <div class="modal-gallery">
+                        <img id="modal-product-img" src="" alt="Detail Produk">
+                    </div>
+                    
+                    <!-- Tabs Interface for Product Details -->
+                    <div class="modal-tabs">
+                        <button class="tab-btn active" data-tab="tab-desc">Deskripsi</button>
+                        <button class="tab-btn" data-tab="tab-specs">Spesifikasi</button>
+                        <button class="tab-btn" data-tab="tab-reviews">Ulasan (3)</button>
+                    </div>
+                    
+                    <div class="tab-content">
+                        <div class="tab-panel active" id="tab-desc">
+                            <p id="modal-product-desc" class="product-desc">Keterangan produk yang cantik...</p>
+                        </div>
+                        <div class="tab-panel" id="tab-specs">
+                            <ul id="modal-product-specs" class="spec-list">
+                                <!-- Dynamic specs will render here -->
+                            </ul>
+                        </div>
+                        <div class="tab-panel" id="tab-reviews">
+                            <div id="modal-product-reviews" class="reviews-list">
+                                <!-- Dynamic reviews will render here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trust Badges -->
+                    <div class="trust-badges">
+                        <div class="trust-badge" title="Jaminan Mutiara Tulen Sabah"><i class="fa-solid fa-award"></i> Mutiara Asli</div>
+                        <div class="trust-badge" title="Dianyam oleh artisan tempatan KK"><i class="fa-solid fa-hands-holding"></i> Buatan Tangan</div>
+                        <div class="trust-badge" title="Hantar cepat guna PosLaju / COD KK"><i class="fa-solid fa-truck-fast"></i> Pos & COD</div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Product Config & Instant Checkout Form -->
+                <div class="modal-info">
+                    <span id="modal-product-badge" class="product-badge">Gelang</span>
+                    <h2 id="modal-product-title">Gelang Mutiara Emas Borneo</h2>
+                    
+                    <div class="modal-rating-row">
+                        <div class="product-rating">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <span>(5.0 Bintang)</span>
+                        </div>
+                        <span class="stock-badge"><i class="fa-solid fa-circle-check"></i> Ada Stok</span>
+                    </div>
+                    
+                    <div id="modal-product-price" class="product-price">RM 120.00</div>
+                    
+                    <div class="product-options">
+                        <!-- Dynamic Options based on category -->
+                        <div id="size-option-group" class="option-group">
+                            <label for="modal-size-select">Pilih Saiz:</label>
+                            <select id="modal-size-select" class="form-control">
+                                <option value="S">S (Kecil)</option>
+                                <option value="M" selected>M (Sederhana)</option>
+                                <option value="L">L (Besar)</option>
+                            </select>
+                        </div>
+                        
+                        <div id="pearl-option-group" class="option-group">
+                            <label for="modal-pearl-select">Jenis Mutiara:</label>
+                            <select id="modal-pearl-select" class="form-control">
+                                <option value="Air Tawar Sabah" selected>Mutiara Air Tawar (Standard)</option>
+                                <option value="Air Masin South Sea (+RM180)">Mutiara Air Masin South Sea (+RM180.00)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px;">
+                        <div class="quantity-selector">
+                            <button id="qty-minus-btn" class="qty-btn" aria-label="Kurangkan Kuantiti"><i class="fa-solid fa-minus"></i></button>
+                            <input type="number" id="modal-qty-input" value="1" min="1" readonly>
+                            <button id="qty-plus-btn" class="qty-btn" aria-label="Tambah Kuantiti"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        <button id="modal-add-to-cart-btn" class="btn btn-outline" style="flex-grow: 1; padding: 0 10px; font-size: 0.85rem; height: 46px;">
+                            <i class="fa-solid fa-cart-plus"></i> + Troli
+                        </button>
+                        <button id="modal-buy-now-btn" class="btn btn-success" style="flex-grow: 1; padding: 0 12px; font-size: 0.85rem; height: 46px; background-color: var(--success); color: white;">
+                            <i class="fa-solid fa-bolt"></i> Beli Sekarang
+                        </button>
+                    </div>
+
+                    <!-- Instant Booking Form directly in Modal -->
+                    <form id="modal-booking-form" class="modal-booking-form">
+                        <h4>Borang Tempahan Segera</h4>
+                        <div class="form-group">
+                            <label for="modal-checkout-name">Nama Penuh *</label>
+                            <input type="text" id="modal-checkout-name" required placeholder="Masukkan nama anda">
+                        </div>
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <label for="modal-checkout-address" style="margin-bottom: 0;">Alamat Penghantaran *</label>
+                                <button type="button" id="modal-pin-location-btn" style="background: none; border: none; color: var(--primary); font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 0;">
+                                    <i class="fa-solid fa-location-dot"></i> Pin Google Maps
+                                </button>
+                            </div>
+                            <textarea id="modal-checkout-address" rows="2" required placeholder="Alamat lengkap pos / COD Kota Kinabalu"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="modal-checkout-notes">Nota Khas (Pilihan)</label>
+                            <input type="text" id="modal-checkout-notes" placeholder="Contoh: Saiz pergelangan tangan khas">
+                        </div>
+                        <button type="submit" id="modal-direct-checkout-btn" class="btn btn-success btn-block">
+                            <i class="fa-solid fa-check"></i> Hantar Tempahan
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Produk Baru -->
+    <div id="add-product-modal" class="modal-overlay">
+        <div class="modal-container modal-form-container">
+            <button id="add-product-close-btn" class="close-btn modal-close-btn" aria-label="Tutup Form">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-form-content">
+                <h3><i class="fa-solid fa-circle-plus"></i> Tambah Produk Baru ke MySQL</h3>
+                <form id="new-product-form" class="new-product-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="prod-id">ID Produk * (Contoh: gelang-04)</label>
+                            <input type="text" id="prod-id" required placeholder="gelang-04">
+                        </div>
+                        <div class="form-group">
+                            <label for="prod-name">Nama Produk *</label>
+                            <input type="text" id="prod-name" required placeholder="Gelang Mutiara Kristal">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="prod-category">Kategori *</label>
+                            <select id="prod-category" class="form-control" required>
+                                <option value="gelang" selected>Gelang</option>
+                                <option value="rantai">Rantai</option>
+                                <option value="cincin">Cincin</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="prod-price">Harga (RM) *</label>
+                            <input type="number" id="prod-price" step="0.01" required placeholder="150.00">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="prod-desc">Deskripsi Produk *</label>
+                        <textarea id="prod-desc" rows="3" required placeholder="Huraikan keindahan produk..."></textarea>
+                    </div>
+                    
+                    <h4>Spesifikasi Produk (MySQL product_specs)</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="spec-material">Bahan (Contoh: Mutiara Asli)</label>
+                            <input type="text" id="spec-material" value="Mutiara Air Tawar Asli">
+                        </div>
+                        <div class="form-group">
+                            <label for="spec-size">Saiz Mutiara (Contoh: 8.5mm)</label>
+                            <input type="text" id="spec-size" placeholder="8.0 mm">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="spec-origin">Asal (Contoh: Semporna)</label>
+                            <input type="text" id="spec-origin" value="Semporna, Sabah">
+                        </div>
+                        <div class="form-group">
+                            <label for="spec-craft">Artisan (Contoh: Gerai 12)</label>
+                            <input type="text" id="spec-craft" value="Kota Kinabalu, Sabah">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Produk ke Database MySQL
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
